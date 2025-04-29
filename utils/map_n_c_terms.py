@@ -52,9 +52,11 @@ def map_n_c_terms(
     print(f"Mapping N-term reads to N candidates...")
     n_map_cmd = [
         "minimap2",
-        "-x", "map-ont",
+        "-x", "map-pb",
         "-a",
         "-t", str(threads),
+        "-I64G", # change these for different computers
+        "-K8G",  # change these for different computers
         n_index,
         n_term_fastq
     ]
@@ -66,12 +68,15 @@ def map_n_c_terms(
     print(f"Mapping C-term reads to C candidates...")
     c_map_cmd = [
         "minimap2",
-        "-x", "map-ont",
+        "-x", "map-pb",
         "-a",
         "-t", str(threads),
+        "-I64G", # change these for different computers
+        "-K8G",  # change these for different computers
         c_index,
         c_term_fastq
     ]
+
     with open(c_term_sam_out, "w") as out_fh:
         subprocess.run(c_map_cmd, check=True, stdout=out_fh)
     print(f"C-term mapping complete. Output: {c_term_sam_out}")

@@ -35,6 +35,8 @@ def map_reads_to_constant2(reads_fastq, constant2_fasta, constant2_index, output
         "-x", "map-pb",             # preset for long noisy reads
         "-a",
         "-t", str(threads),           # number of threads
+        "-I64G", # change these for different computers
+        "-K8G",  # change these for different computers
         constant2_index,              # indexed Constant2 file
         reads_fastq                   # reads to map
     ]
