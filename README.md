@@ -11,6 +11,6 @@ python run_pipeline.py \
     --n_candidates Tests/references/trim_nterm.fasta \
     --c_candidates Tests/references/trim_cterm.fasta \
     --output_dir Tests/outputs \
-    --threads 128 \
+    --threads 128
 
     
