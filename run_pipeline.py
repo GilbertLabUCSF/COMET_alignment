@@ -36,7 +36,6 @@ def main(args):
 
     # 2. Split reads at Constant2
     split_reads_at_constant2(
-        args.reads,
         constant2_mapping_sam,
         n_term_fastq,
         c_term_fastq,
@@ -60,7 +59,9 @@ def main(args):
     summarize_n_c_matches(
         n_term_mapping_sam,
         c_term_mapping_sam,
-        summary_tsv
+        summary_tsv,
+        n_index,
+        c_index
     )
 
     print("\n✅ Pipeline complete!")
@@ -79,53 +80,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
 
-
-# old code below
-"""
-import os
-from utils.find_constant2 import map_reads_to_constant2
-from utils.split_reads import split_reads_at_constant2
-from utils.map_n_c_terms import map_n_c_terms
-from utils.summarize_results import summarize_n_c_matches
-
-def main(reads_fastq, constant2_fasta, n_candidates_fasta, c_candidates_fasta):
-    # Define output directory
-    output_dir = "output/"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Index paths
-    constant2_index = os.path.join(output_dir, "constant2.mmi")
-    n_index = os.path.join(output_dir, "N_candidates.mmi")
-    c_index = os.path.join(output_dir, "C_candidates.mmi")
-    
-    # Output file paths
-    constant2_mapping_sam = os.path.join(output_dir, "reads_vs_constant2.sam")
-    n_term_fastq = os.path.join(output_dir, "n_term.fastq")
-    c_term_fastq = os.path.join(output_dir, "c_term.fastq")
-    bad_reads_fastq = os.path.join(output_dir, "bad_reads.fastq")
-    
-    n_term_mapping_sam = os.path.join(output_dir, "n_term.sam")
-    c_term_mapping_sam = os.path.join(output_dir, "c_term.sam")
-    summary_tsv = os.path.join(output_dir, "n_c_summary.tsv")
-
-    # 1. Map reads to Constant2
-    map_reads_to_constant2(reads_fastq, constant2_fasta, constant2_index, constant2_mapping_sam)
-
-    # 2. Split reads into N- and C-term
-    split_reads_at_constant2(reads_fastq, constant2_mapping_sam, n_term_fastq, c_term_fastq, bad_reads_fastq)
-
-    # 3. Map N-terms and C-terms to their candidate references
-    map_n_c_terms(n_term_fastq, c_term_fastq, n_candidates_fasta, c_candidates_fasta, n_index, c_index, n_term_mapping_sam, c_term_mapping_sam)
-
-    # 4. Summarize results
-    summarize_n_c_matches(n_term_mapping_sam, c_term_mapping_sam, summary_tsv)
-
-if __name__ == "__main__":
-    # Later we can add argparse here, but for now just manual call:
-    reads_fastq = "data/reads.fastq"
-    constant2_fasta = "data/constant2.fasta"
-    n_candidates_fasta = "data/N_candidates.fasta"
-    c_candidates_fasta = "data/C_candidates.fasta"
-
-    main(reads_fastq, constant2_fasta, n_candidates_fasta, c_candidates_fasta)
-"""

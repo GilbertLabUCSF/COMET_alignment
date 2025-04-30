@@ -11,7 +11,7 @@ def open_maybe_gzip(path, mode="rt"):
     else:
         return open(path, mode)
 
-def split_reads_at_constant2(reads_fastq, constant2_mapping_sam, n_term_out, c_term_out, bad_reads_out, mapq_threshold=20):
+def split_reads_at_constant2(constant2_mapping_sam, n_term_out, c_term_out, bad_reads_out, mapq_threshold=60):
     """
     Splits reads based on Constant2 mapping.
     
@@ -30,6 +30,8 @@ def split_reads_at_constant2(reads_fastq, constant2_mapping_sam, n_term_out, c_t
     n_term_records = []
     c_term_records = []
     bad_dCas9_records = []
+
+    reference_length_cutoff = samfile.lengths[0] * 0.8
 
 
     for read in tqdm(samfile.fetch(until_eof=True), desc="Processing dCas9 alignment sam file"):
@@ -62,7 +64,7 @@ def split_reads_at_constant2(reads_fastq, constant2_mapping_sam, n_term_out, c_t
             record.annotations[f"SAM_tag_{tag}"] = value
 
         # if read does not map, is too short, or is bad quality it is a bad read
-        if read.is_unmapped or aln_end - aln_start < 3000 or read.mapping_quality < mapq_threshold:
+        if read.is_unmapped or read.reference_length < reference_length_cutoff or read.mapping_quality < mapq_threshold:
             bad_dCas9_records.append(record)
         else:
             n_seq = record.seq[:aln_start]

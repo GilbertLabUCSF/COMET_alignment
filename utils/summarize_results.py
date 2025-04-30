@@ -1,7 +1,9 @@
 import pysam
+from Bio import SeqIO
 import csv
+from tqdm import tqdm
 
-def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, mapq_threshold=20):
+def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_index, mapq_threshold=20):
     """
     Summarize best N and C matches for each read based on SAM alignments.
     
@@ -11,17 +13,43 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, mapq_threshol
         summary_tsv_out (str): Output TSV summarizing best N and C matches.
         mapq_threshold (int): Minimum MAPQ to consider a mapping valid.
     """
+
+    # ref_n_lengths = {
+    #     record.id: 0.8 * len(record.seq)
+    #     for record in SeqIO.parse(n_index, "fasta")
+    # }
+
+    # ref_c_lengths = {
+    #     record.id: 0.8 * len(record.seq)
+    #     for record in SeqIO.parse(c_index, "fasta")
+    # }
+
+    
+
+
     print(f"Parsing N-term mappings from {n_term_sam}")
     n_best_hits = {}
     n_samfile = pysam.AlignmentFile(n_term_sam, "r")
-    for read in n_samfile.fetch(until_eof=True):
+
+    ref_n_lengths = {
+        ref: length * 0.8 
+            for ref, length in zip(n_samfile.references, n_samfile.lengths)
+        }
+
+
+    for read in tqdm(n_samfile.fetch(until_eof=True)):
         if read.is_unmapped:
             continue
         if read.mapping_quality < mapq_threshold:
             continue
+
+        ref_name = read.reference_name
+
+        # if less than 80% of the read is aligning throw it away
+        if read.query_alignment_end - read.query_alignment_start < ref_n_lengths[ref_name]:
+            continue
         
         read_id = read.query_name
-        ref_name = read.reference_name
         mapq = read.mapping_quality
 
         # Keep only the best match (highest MAPQ)
@@ -32,7 +60,13 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, mapq_threshol
     print(f"Parsing C-term mappings from {c_term_sam}")
     c_best_hits = {}
     c_samfile = pysam.AlignmentFile(c_term_sam, "r")
-    for read in c_samfile.fetch(until_eof=True):
+
+    ref_c_lengths = {
+        ref: length * 0.8 
+            for ref, length in zip(c_samfile.references, c_samfile.lengths)
+        }
+
+    for read in tqdm(c_samfile.fetch(until_eof=True)):
         if read.is_unmapped:
             continue
         if read.mapping_quality < mapq_threshold:
@@ -41,6 +75,9 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, mapq_threshol
         read_id = read.query_name
         ref_name = read.reference_name
         mapq = read.mapping_quality
+
+        if read.query_alignment_end - read.query_alignment_start < ref_c_lengths[ref_name]:
+            continue
 
         # Keep only the best match (highest MAPQ)
         if read_id not in c_best_hits or mapq > c_best_hits[read_id][1]:
