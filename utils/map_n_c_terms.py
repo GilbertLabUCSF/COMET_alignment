@@ -57,6 +57,7 @@ def map_n_c_terms(
         "-t", str(threads),
         "-I64G", # change these for different computers
         "-K8G",  # change these for different computers
+        "--end-bonus", "100",
         n_index,
         n_term_fastq
     ]
@@ -73,6 +74,7 @@ def map_n_c_terms(
         "-t", str(threads),
         "-I64G", # change these for different computers
         "-K8G",  # change these for different computers
+        "--end-bonus", "100",
         c_index,
         c_term_fastq
     ]

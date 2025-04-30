@@ -95,24 +95,8 @@ def split_reads_at_constant2(constant2_mapping_sam, n_term_out, c_term_out, bad_
                 c_record.seq = c_seq
                 c_record.letter_annotations["phred_quality"] = letter_annots["phred_quality"][aln_end:]
                 c_term_records.append(c_record)
-
-
-        
-        # read_id = read.query_name
-        # is_reverse = read.is_reverse
-        # # print("is reverse:",is_reverse)
-
-        # aln_start = read.reference_start   # 0-based start on reference (Constant2)
-        # aln_end = read.reference_end       # 0-based end on reference
-        
-        # # Save alignment positions
-        # good_alignments[read_id] = (read.query_alignment_start, read.query_alignment_end)
-
-                
-
                 
     samfile.close()
-
 
     print(f"Writing {len(n_term_records)} N-term reads to {n_term_out}")
     print(f"Writing {len(c_term_records)} C-term reads to {c_term_out}")

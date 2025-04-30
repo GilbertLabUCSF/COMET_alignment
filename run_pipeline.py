@@ -3,6 +3,7 @@ import argparse
 
 from utils.find_constant2 import map_reads_to_constant2
 from utils.split_reads import split_reads_at_constant2
+from utils.split_read_parallel import split_reads_at_constant2_parallel
 from utils.map_n_c_terms import map_n_c_terms
 from utils.summarize_results import summarize_n_c_matches
 
@@ -35,12 +36,20 @@ def main(args):
     )
 
     # 2. Split reads at Constant2
-    split_reads_at_constant2(
-        constant2_mapping_sam,
-        n_term_fastq,
-        c_term_fastq,
-        bad_reads_fastq
-    )
+    if args.parallel:
+        split_reads_at_constant2_parallel(
+            constant2_mapping_sam,
+            n_term_fastq,
+            c_term_fastq,
+            bad_reads_fastq
+        )
+    else:
+        split_reads_at_constant2(
+            constant2_mapping_sam,
+            n_term_fastq,
+            c_term_fastq,
+            bad_reads_fastq
+        )
 
     # 3. Map N-term and C-term sequences to candidates
     map_n_c_terms(
@@ -76,6 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("--c_candidates", required=True, help="FASTA file with candidate C-terminal sequences.")
     parser.add_argument("--output_dir", default="output", help="Directory to save all outputs. (default: output)")
     parser.add_argument("--threads", type=int, default=8, help="Number of threads for minimap2. (default: 8)")
+    parser.add_argument("--parallel", action="store_true", help="Enable multithreading in split_reads") # i don't think this makes anything faster (might even make code slower)
 
     args = parser.parse_args()
     main(args)

@@ -32,7 +32,7 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
     n_samfile = pysam.AlignmentFile(n_term_sam, "r")
 
     ref_n_lengths = {
-        ref: length * 0.8 
+        ref: length * 0.95
             for ref, length in zip(n_samfile.references, n_samfile.lengths)
         }
 
@@ -42,6 +42,7 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
             continue
         if read.mapping_quality < mapq_threshold:
             continue
+
 
         ref_name = read.reference_name
 
@@ -55,6 +56,7 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
         # Keep only the best match (highest MAPQ)
         if read_id not in n_best_hits or mapq > n_best_hits[read_id][1]:
             n_best_hits[read_id] = (ref_name, mapq)
+
     n_samfile.close()
 
     print(f"Parsing C-term mappings from {c_term_sam}")
@@ -62,7 +64,7 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
     c_samfile = pysam.AlignmentFile(c_term_sam, "r")
 
     ref_c_lengths = {
-        ref: length * 0.8 
+        ref: length * 0.95
             for ref, length in zip(c_samfile.references, c_samfile.lengths)
         }
 
