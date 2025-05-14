@@ -1,0 +1,5 @@
+test_short:
+    CCS_fastq_fn: /home/nicholass/COMET/Tests/inputs/COMET_raw_R2TF_short.fastq.gz
+    dCas9: /home/nicholass/COMET/Tests/references/dCas9.fasta
+    n_candidates: /home/nicholass/COMET/Tests/references/trim_nterm.fasta
+    c_candidates: /home/nicholass/COMET/Tests/references/trim_cterm.fasta

@@ -3,7 +3,7 @@ from Bio import SeqIO
 import csv
 from tqdm import tqdm
 
-def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_index, mapq_threshold=20):
+def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, counts_tsv, mapq_threshold=50):
     """
     Summarize best N and C matches for each read based on SAM alignments.
     
@@ -13,18 +13,6 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
         summary_tsv_out (str): Output TSV summarizing best N and C matches.
         mapq_threshold (int): Minimum MAPQ to consider a mapping valid.
     """
-
-    # ref_n_lengths = {
-    #     record.id: 0.8 * len(record.seq)
-    #     for record in SeqIO.parse(n_index, "fasta")
-    # }
-
-    # ref_c_lengths = {
-    #     record.id: 0.8 * len(record.seq)
-    #     for record in SeqIO.parse(c_index, "fasta")
-    # }
-
-    
 
 
     print(f"Parsing N-term mappings from {n_term_sam}")
@@ -91,6 +79,8 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
 
     print(f"Summarizing {len(all_read_ids)} reads...")
 
+    n_c_counts = {}
+
     # Write TSV output
     with open(summary_tsv_out, "w", newline="") as f:
         writer = csv.writer(f, delimiter="\t")
@@ -101,4 +91,17 @@ def summarize_n_c_matches(n_term_sam, c_term_sam, summary_tsv_out, n_index, c_in
             c_info = c_best_hits.get(read_id, ("None", 0))
             writer.writerow([read_id, n_info[0], n_info[1], c_info[0], c_info[1]])
 
-    print(f"Summary written to {summary_tsv_out}")
+            # counting the occurence of each combinaiton if it has both domains called
+            if n_info[0] is not None and c_info is not None:
+                n_c_name = f"{n_info[0]}_{c_info[0]}"
+                n_c_counts[n_c_name] = n_c_counts.get(n_c_name, 0) + 1
+
+    # writing the accumilated counts of each N C combination
+    with open(counts_tsv, 'w', newline='') as f:
+        writer = csv.writer(f, delimiter="\t")
+        writer.writerow(["N_C_combo", "count"])
+        for name, count in n_c_counts.items():
+            writer.writerow([name, count])
+
+    print(f"Read call summary written to {summary_tsv_out}")
+    print(f"Counts summary written to {counts_tsv}")

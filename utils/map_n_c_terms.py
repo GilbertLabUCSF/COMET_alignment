@@ -32,7 +32,7 @@ def map_n_c_terms(
     if not os.path.exists(n_index):
         print(f"Building minimap2 index for N candidates: {n_candidates_fasta}")
         subprocess.run(
-            ["minimap2", "-x", "-d", n_index, n_candidates_fasta],
+            ["minimap2", "-d", n_index, n_candidates_fasta],
             check=True
         )
     else:
@@ -42,7 +42,7 @@ def map_n_c_terms(
     if not os.path.exists(c_index):
         print(f"Building minimap2 index for C candidates: {c_candidates_fasta}")
         subprocess.run(
-            ["minimap2", "-x", "-d", c_index, c_candidates_fasta],
+            ["minimap2", "-d", c_index, c_candidates_fasta],
             check=True
         )
     else:
