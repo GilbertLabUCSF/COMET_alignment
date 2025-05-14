@@ -21,6 +21,7 @@ def map_reads_to_constant2(reads_fastq, constant2_fasta, constant2_index, output
         print(f"Building minimap2 index for Constant2: {constant2_fasta}")
         index_cmd = [
             "minimap2",
+            "-x",
             "-d", constant2_index,
             constant2_fasta
         ]
